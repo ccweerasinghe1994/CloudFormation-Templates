@@ -3,12 +3,16 @@ Parameters:
   SecurityGroupDescription:
     Description: Security Group Description
     Type: String
+  AvailabilityZone:
+    Description: Availability description for the ec2 instance
+    Type: String
+    AllowedValues: [ "us-east-1a", "us-east-1b", "us-east-1c", "us-east-1d" ]
 
 Resources:
-  MyInstance:
+  MyWebServerInstance:
     Type: AWS::EC2::Instance
     Properties:
-      AvailabilityZone: us-east-1a
+      AvailabilityZone: !Ref AvailabilityZone
       ImageId: ami-a4c7edb2
       InstanceType: t2.micro
       SecurityGroups:
@@ -19,7 +23,7 @@ Resources:
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
-      InstanceId: !Ref MyInstance
+      InstanceId: !Ref MyWebServerInstance
 
   # our EC2 security group
   SSHSecurityGroup:
@@ -27,10 +31,10 @@ Resources:
     Properties:
       GroupDescription: Enable SSH access via port 22
       SecurityGroupIngress:
-      - CidrIp: 0.0.0.0/0
-        FromPort: 22
-        IpProtocol: tcp
-        ToPort: 22
+        - CidrIp: 0.0.0.0/0
+          FromPort: 22
+          IpProtocol: tcp
+          ToPort: 22
 
   # our second EC2 security group
   ServerSecurityGroup:
@@ -38,11 +42,11 @@ Resources:
     Properties:
       GroupDescription: !Ref SecurityGroupDescription
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: 80
-        ToPort: 80
-        CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 192.168.1.1/32
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 192.168.1.1/32
